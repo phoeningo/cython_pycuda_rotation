@@ -69,33 +69,6 @@ def gpu_rotate(a_gpu=None,R_gpu=None,b_gpu=None,grid=None):
   func(a_gpu,R_gpu,b_gpu,block=(1,1,1),grid=grid)
     
 
-'''
-def cuda_test(a=None,R=None,b=None):
-  
-  func=mod.get_function("calc")
- 
-  a_gpu=cuda.mem_alloc(a.nbytes)
-  cuda.memcpy_htod(a_gpu,a)
 
-  out_gpu=cuda.mem_alloc(a.nbytes)
-  cuda.memcpy_htod(out_gpu,a)
-
-
-  #R=np.float32(euler2matrix((90,0,0),'zxz')).copy(order='C')
-  matrix_gpu=cuda.mem_alloc(R.nbytes)
-  cuda.memcpy_htod(matrix_gpu,R)
-
-  res=np.empty_like(a)
-  #print(res)
-  func(a_gpu,matrix_gpu,out_gpu,block=(1,1,1),grid=a.shape)
-  
-  cuda.memcpy_dtoh(b,out_gpu)
-  b=None
-
-
-
-#print(cuda.device_attribute.MAX_BLOCK_DIM_X)
-
-'''
 
 

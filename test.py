@@ -27,32 +27,27 @@ for ang in ang_sp:
 
 seq=args.rot_seq
 
-#print('reading input volume...')
 input_volume,angpix=M.read_pix_mrc(args.input_mrc)
-#print('done.')
-#print('malloc host memory...')
 output_volume=np.empty_like(input_volume)
 R=np.float32(invMatrix(angle,seq))
 
 print('malloc device memory...')
-a_gpu=cuda.mem_alloc(input_volume.nbytes)
-b_gpu=cuda.mem_alloc(input_volume.nbytes)
-R_gpu=cuda.mem_alloc(R.nbytes)
 
+total_mem=cuda.mem_alloc(input_volume.nbytes*2+R.nbytes)
+
+a_gpu=total_mem
+b_gpu=int(a_gpu)+input_volume.nbytes 
+R_gpu=int(b_gpu)+input_volume.nbytes
 print('done.')
+
 cuda.memcpy_htod(a_gpu,input_volume)
-cuda.memcpy_htod(b_gpu,input_volume)
 cuda.memcpy_htod(R_gpu,R)
 
 
 grid=input_volume.shape
-gpu_rotate(a_gpu,R_gpu,b_gpu,grid)
+gpu_rotate(np.intp(a_gpu),np.intp(R_gpu),np.intp(b_gpu),grid)
 
 cuda.memcpy_dtoh(output_volume,b_gpu)
-#cuda.free()
-
-#cuda_test(input_volume,R,output_volume)
-#volume=C.rotate(input_volume,angle,seq)
 M.write_pix_file(output_volume,args.output_mrc,angpix)
 
 
